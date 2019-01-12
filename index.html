@@ -35,52 +35,112 @@
   <meta name="msapplication-TileImage" content="images/icons/google-home.png">
   <meta name="msapplication-TileColor" content="#F2F2F2">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 </head>
 
 <body>
   <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .boton-rasp {
+      transition: all 1s;
+      border-radius: 15px;
+      text-align: center;
+    }
+
     .disabled {
       box-shadow: 0px 0px 10px #F24141;
       background: #F24141;
-      transition: all 1s;
+
     }
 
     .enabled {
       box-shadow: 0px 0px 10px #38A654;
       background: #38A654;
-      transition: all 1s;
     }
   </style>
   <header class="header">
     <h1 class="header__title">Home Controller</h1>
-    <button id="butRefresh" class="headerButton" aria-label="Refresh"></button>
-    <button id="butAdd" class="headerButton" aria-label="Add"></button>
+    <button id="butRefresh" class="headerButton" aria-label="Refresh" onclick="refresh()"></button>
   </header>
 
   <main class="main">
-    <div class="card cardTemplate weather-forecast disabled" onclick="changeState(this, 21)">
+    <div class="card cardTemplate weather-forecast boton-rasp habitacion" onclick="changeState(this, 21)">
       <div class="location">Habitación</div>
-      <div class="date">Apagado</div>
+      <div class="date">Cargando...</div>
     </div>
   </main>
 
   <!-- Uncomment the line below when ready to test with fake data -->
   <script>
+    var disabled = false;
+    jQuery(window).ready(function () {
+      refresh();
+      setInterval(refresh, 500);
+    });
+
+    function refresh() {
+      getState(jQuery('.habitacion'), 21);
+    }
+
     function changeState(obj, pin) {
+      if (!disabled) {
+        disabled = true;
+        var ajaxurl = "/app.php";
+        jQuery.post(ajaxurl, {
+          type: "POST",
+          opt: 'changeState',
+          pin: pin
+        }, function (data) {
+          console.log(data);
+          if (jQuery(obj).hasClass('disabled')) {
+            jQuery(obj).removeClass('disabled').addClass('enabled');
+            jQuery(obj).find('.date').text('Encendido');
+          } else {
+            jQuery(obj).removeClass('enabled').addClass('disabled');
+            jQuery(obj).find('.date').text('Apagado');
+          }
+          setTimeout(function () {
+            disabled = false;
+          }, 5000);
+        }, 'text');
+      }
+
+    }
+
+
+    function getState(obj, pin) {
       var ajaxurl = "/app.php";
       jQuery.post(ajaxurl, {
         type: "POST",
-        opt: 'changeState',
+        opt: 'getState',
         pin: pin
       }, function (data) {
-        console.log(data);
-        if (jQuery(obj).hasClass('disabled')) {
-          jQuery(obj).removeClass('disabled').addClass('enabled');
-          jQuery(obj).find('.date').text('Encendido');
+        var datos = parseInt(data);
+        if (datos) {
+          if (!jQuery(obj).hasClass('disabled') || !jQuery(obj).hasClass('enabled')) {
+            jQuery(obj).removeClass('disabled').addClass('enabled');
+            jQuery(obj).find('.date').text('Encendido');
+          } else {
+            if (jQuery(obj).hasClass('disabled')) {
+              jQuery(obj).removeClass('disabled').addClass('enabled');
+              jQuery(obj).find('.date').text('Encendido');
+            }
+          }
         } else {
-          jQuery(obj).removeClass('enabled').addClass('disabled');
-          jQuery(obj).find('.date').text('Apagado');
+          if (!jQuery(obj).hasClass('disabled') || !jQuery(obj).hasClass('enabled')) {
+            jQuery(obj).removeClass('enabled').addClass('disabled');
+            jQuery(obj).find('.date').text('Apagado');
+          } else {
+            if (jQuery(obj).hasClass('enabled')) {
+              jQuery(obj).removeClass('enabled').addClass('disabled');
+              jQuery(obj).find('.date').text('Apagado');
+            }
+          }
         }
+
       }, 'text');
     }
   </script>
