@@ -1,0 +1,29 @@
+{
+  "name": "Home Controller",
+  "short_name": "Home Controller",
+  "icons": [{
+    "src": "images/icons/google-home.png",
+    "sizes": "128x128",
+    "type": "image/png"
+  }, {
+    "src": "images/icons/google-home.png",
+    "sizes": "144x144",
+    "type": "image/png"
+  }, {
+    "src": "images/icons/google-home.png",
+    "sizes": "152x152",
+    "type": "image/png"
+  }, {
+    "src": "images/icons/google-home.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  }, {
+    "src": "images/icons/google-home.png",
+    "sizes": "256x256",
+    "type": "image/png"
+  }],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#F2F2F2",
+  "theme_color": "#F2F2F2"
+}
